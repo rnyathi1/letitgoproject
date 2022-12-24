@@ -21,33 +21,34 @@ public class Main extends Game {
 	public static final short ENEMY_HEAD_BIT = 64;
 	public SpriteBatch batch;
 	private AppPreferences preferences;
-	private PreferencesScreen preferencesScreen;
+	private OptionsScreen preferencesScreen;
 	private LevelOneScreen levelOneScreen;
 	private LoadingScreen loadingScreen;
 	private MenuScreen menuScreen;
 	private LevelTwoScreen levelTwoScreen;
 	private LevelThreeScreen levelThreeScreen;
 	private GameOverScreen gameOverScreen;
+
 	public final static int MENU = 0;
 	public final static int PREFERENCES = 1;
 	public final static int LEVELONE = 2;
 	public final static int LEVELTWO = 3;
 	public final static int LEVELTHREE = 4;
-	public final static int ENDGAME = 5;
+	public final static int LOADINGSCREEN = 5;
+	public final static int ENDGAME = 6;
 
 	public void changeScreen(int screen){
 		switch(screen){
 			case MENU:
-				if(menuScreen == null){
+
 					menuScreen = new MenuScreen(this);
-				}
+
 				this.setScreen(menuScreen);
 				break;
 			case PREFERENCES:
-				if(preferencesScreen == null){
-					preferencesScreen = new PreferencesScreen(this);
 
-				}
+					preferencesScreen = new OptionsScreen(this);
+
 				this.setScreen(preferencesScreen);
 				break;
 			case LEVELONE:
@@ -71,6 +72,11 @@ public class Main extends Game {
 				}
 				this.setScreen(levelThreeScreen);
 				break;
+			case LOADINGSCREEN:
+
+				loadingScreen = new LoadingScreen(this);
+				this.setScreen(loadingScreen);
+				break;
 			case ENDGAME:
 				if(gameOverScreen == null){
 					gameOverScreen = new GameOverScreen(this);
@@ -90,9 +96,9 @@ public class Main extends Game {
 		manager.load("audio/sounds/breakblock.wav", Sound.class);
 		manager.finishLoading();
 
-		loadingScreen = new LoadingScreen(this);
+		//loadingScreen = new LoadingScreen(this);
 		preferences = new AppPreferences();
-		setScreen(loadingScreen);
+		changeScreen(MENU);
 
 	}
 
