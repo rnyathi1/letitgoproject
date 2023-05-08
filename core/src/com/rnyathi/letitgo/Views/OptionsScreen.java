@@ -17,16 +17,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-public class PreferencesScreen implements Screen {
+public class OptionsScreen implements Screen {
     private Main parent;
     private Stage stage;
     private Label titleLabel;
     private Label volumeMusicLabel;
-    private Label volumeSoundLabel;
+    private Label difficultyLabel;
     private Label musicOnOffLabel;
-    private Label soundOnOffLabel;
 
-    public PreferencesScreen(Main main){
+
+    public OptionsScreen(Main main){
         parent = main;
         stage = new Stage(new ScreenViewport());
 
@@ -42,8 +42,6 @@ public class PreferencesScreen implements Screen {
         table.setFillParent(true);
         //table.setDebug(true);
 
-
-        // temporary until we have asset manager in
         Skin skin = new Skin(Gdx.files.internal("Skins/glassy-ui.json"));
 
         // music volume
@@ -53,22 +51,12 @@ public class PreferencesScreen implements Screen {
             @Override
             public boolean handle(Event event) {
                 parent.getPreferences().setMusicVolume(volumeMusicSlider.getValue());
-                // updateVolumeLabel();
+
                 return false;
             }
         });
 
-        // sound volume
-        final Slider soundMusicSlider = new Slider(0f, 1f, 0.1f, false, skin);
-        soundMusicSlider.setValue(parent.getPreferences().getSoundVolume());
-        soundMusicSlider.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                parent.getPreferences().setSoundVolume(soundMusicSlider.getValue());
-                // updateVolumeLabel();
-                return false;
-            }
-        });
+
 
         // music on/off
         final CheckBox musicCheckbox = new CheckBox(null, skin);
@@ -82,20 +70,26 @@ public class PreferencesScreen implements Screen {
             }
         });
 
-        // sound on/off
-        final CheckBox soundEffectsCheckbox = new CheckBox(null, skin);
-        soundEffectsCheckbox.setChecked(parent.getPreferences().isSoundEffectsEnabled());
-        soundEffectsCheckbox.addListener(new EventListener() {
+
+        final TextButton difficultyButton = new TextButton("Difficulty", skin,"small");
+        difficultyButton.addListener(new ChangeListener() {
             @Override
-            public boolean handle(Event event) {
-                boolean enabled = soundEffectsCheckbox.isChecked();
-                parent.getPreferences().setSoundEffectsEnabled(enabled);
-                return false;
+            public void changed(ChangeEvent event, Actor actor) {
+
+                if(Main.difficulty < 3){
+                    parent.addDifficulty();
+                    difficultyLabel.setText(Main.difficulty);
+                } else {
+                    Main.difficulty = 1;
+                    difficultyLabel.setText(Main.difficulty);
+                }
+
+
             }
         });
 
         // return to main screen button
-        final TextButton backButton = new TextButton("Back", skin);
+        final TextButton backButton = new TextButton("Back", skin,"small");
         backButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -104,11 +98,11 @@ public class PreferencesScreen implements Screen {
             }
         });
 
-        titleLabel = new Label( "Preferences", skin );
+        titleLabel = new Label( "Options", skin );
         volumeMusicLabel = new Label( "Music Volume", skin );
-        volumeSoundLabel = new Label( "Sound Volume", skin );
         musicOnOffLabel = new Label( "Music", skin );
-        soundOnOffLabel = new Label( "Sound Effect", skin );
+        difficultyLabel = new Label(Integer.toString(Main.difficulty),skin);
+
 
         table.add(titleLabel).colspan(2);
         table.row().pad(10,0,0,10);
@@ -118,11 +112,8 @@ public class PreferencesScreen implements Screen {
         table.add(musicOnOffLabel).left();
         table.add(musicCheckbox);
         table.row().pad(10,0,0,10);
-        table.add(volumeSoundLabel).left();
-        table.add(soundMusicSlider);
-        table.row().pad(10,0,0,10);
-        table.add(soundOnOffLabel).left();
-        table.add(soundEffectsCheckbox);
+        table.add(difficultyButton).left();
+        table.add(difficultyLabel);
         table.row().pad(10,0,0,10);
         table.add(backButton).colspan(2);
         stage.addActor(table);
@@ -172,4 +163,5 @@ public class PreferencesScreen implements Screen {
         stage.dispose();
 
     }
+
 }

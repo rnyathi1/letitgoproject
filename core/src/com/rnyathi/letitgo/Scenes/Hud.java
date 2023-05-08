@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.rnyathi.letitgo.Main;
@@ -22,7 +21,7 @@ public class Hud implements Disposable {
     private static Integer score;
 
     private Label countdownLabel;
-    private static Label scoreLabel;
+    private Label scoreLabel;
     private  Label timeLabel;
     private Label levelLabel;
     private Label worldLabel;
@@ -46,9 +45,7 @@ public class Hud implements Disposable {
         levelLabel = new Label("1", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         worldLabel = new Label("World", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         playerLabel = new Label("Player", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        Label name = new Label("RYAN GAME", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        table.add(name).center();
-        table.row();
+
         table.add(playerLabel).expandX().padTop(10);
         table.add(worldLabel).expandX().padTop(10);
         table.add(timeLabel).expandX().padTop(10);
@@ -60,6 +57,7 @@ public class Hud implements Disposable {
         stage.addActor(table);
 
     }
+
     public void update(float dt){
         timeCount += dt;
         if(timeCount >= 1){
@@ -67,11 +65,19 @@ public class Hud implements Disposable {
             countdownLabel.setText(String.format("%03d",worldTimer));
             timeCount = 0;
         }
+        scoreLabel.setText(String.format("%06d",score));
     }
-
+    public String getTimeCount(){
+        return String.format("%03d",worldTimer);
+    }
+    public String getScore(){
+        return String.format("%06d",score);
+    }
+    public void setLevelLabel(String world){
+        levelLabel.setText(world);
+    }
     public static void addScore(int value){
         score += value;
-        scoreLabel.setText(String.format("%06d",score));
     }
 
 

@@ -10,15 +10,23 @@ import com.rnyathi.letitgo.Views.*;
 public class Main extends Game {
 	public static final int V_WIDTH = 400;
 	public static final int V_HEIGHT = 208;
+	public  static int difficulty = 1;
 	public static final float PPM = 100;
 	public static AssetManager manager;
 	public static final short GROUND_BIT = 1;
 	public static final short PLAYER_BIT = 2;
-	public static final short BRICK_BIT = 4;
-	public static final short DESTROYED_BIT = 8;
-	public static final short OBJECT_BIT = 16;
-	public static final short ENEMY_BIT = 32;
-	public static final short ENEMY_HEAD_BIT = 64;
+	public static final short ENEMY_BOUNDARY_BIT = 4;
+	public static final short COMPLETION_BIT = 8;
+	public static final short ENEMY_BIT = 16;
+	public static final short ENEMY_HEAD_BIT = 32;
+	public static final short BAT_SPAWNER_BIT = 64;
+	public static final short FIREBALL_BIT = 128;
+	public static final short BOSS_BIT = 256;
+	public boolean levelOneComplete = true;
+	public boolean levelTwoComplete = true;
+	public int level = 1;
+
+
 	public SpriteBatch batch;
 	private AppPreferences preferences;
 	private OptionsScreen preferencesScreen;
@@ -27,6 +35,7 @@ public class Main extends Game {
 	private MenuScreen menuScreen;
 	private LevelTwoScreen levelTwoScreen;
 	private LevelThreeScreen levelThreeScreen;
+	private CompletedScreen completedScreen;
 	private GameOverScreen gameOverScreen;
 
 	public final static int MENU = 0;
@@ -35,7 +44,9 @@ public class Main extends Game {
 	public final static int LEVELTWO = 3;
 	public final static int LEVELTHREE = 4;
 	public final static int LOADINGSCREEN = 5;
-	public final static int ENDGAME = 6;
+	public final static int COMPLETEDSCREEN = 6;
+	public final static int GAMEOVERSCREEN = 7;
+
 
 	public void changeScreen(int screen){
 		switch(screen){
@@ -44,6 +55,7 @@ public class Main extends Game {
 					menuScreen = new MenuScreen(this);
 
 				this.setScreen(menuScreen);
+
 				break;
 			case PREFERENCES:
 
@@ -52,24 +64,19 @@ public class Main extends Game {
 				this.setScreen(preferencesScreen);
 				break;
 			case LEVELONE:
-				if(levelOneScreen == null){
-					levelOneScreen = new LevelOneScreen(this);
 
-				}
+				levelOneScreen = new LevelOneScreen(this);
+
+
 				this.setScreen(levelOneScreen);
 				break;
 			case LEVELTWO:
-				if(levelTwoScreen == null){
-					levelTwoScreen = new LevelTwoScreen(this);
 
-				}
+				levelTwoScreen = new LevelTwoScreen(this);
 				this.setScreen(levelTwoScreen);
 				break;
 			case LEVELTHREE:
-				if(levelThreeScreen == null){
-					levelThreeScreen = new LevelThreeScreen(this);
-
-				}
+				levelThreeScreen = new LevelThreeScreen(this);
 				this.setScreen(levelThreeScreen);
 				break;
 			case LOADINGSCREEN:
@@ -77,11 +84,17 @@ public class Main extends Game {
 				loadingScreen = new LoadingScreen(this);
 				this.setScreen(loadingScreen);
 				break;
-			case ENDGAME:
-				if(gameOverScreen == null){
-					gameOverScreen = new GameOverScreen(this);
 
-				}
+		}
+	}
+	public void changeScreen(int screen, String score,String time, int level){
+		switch(screen) {
+			case COMPLETEDSCREEN:
+				completedScreen = new CompletedScreen(this, score, time);
+				this.setScreen(completedScreen);
+				break;
+			case GAMEOVERSCREEN:
+				gameOverScreen = new GameOverScreen(this, score, time, level);
 				this.setScreen(gameOverScreen);
 				break;
 		}
@@ -96,9 +109,9 @@ public class Main extends Game {
 		manager.load("audio/sounds/breakblock.wav", Sound.class);
 		manager.finishLoading();
 
-		//loadingScreen = new LoadingScreen(this);
+
 		preferences = new AppPreferences();
-		changeScreen(MENU);
+		changeScreen(Main.MENU);
 
 	}
 
@@ -116,4 +129,10 @@ public class Main extends Game {
 	public void dispose () {
 		super.dispose();
 	}
+
+	public void addDifficulty(){
+		difficulty+=1;
+	}
 }
+
+

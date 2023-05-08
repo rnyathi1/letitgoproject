@@ -12,6 +12,8 @@ import com.rnyathi.letitgo.Views.LevelThreeScreen;
 import com.rnyathi.letitgo.Views.LevelTwoScreen;
 
 public class Player extends Sprite {
+
+
     public enum State {FALLING,JUMPING,STANDING,RUNNING,DEAD};
     public State currentState;
     public State previousState;
@@ -19,12 +21,15 @@ public class Player extends Sprite {
     private Animation playerJump;
     private boolean runningRight;
     private boolean isDead;
+    private boolean isComplete;
     private float stateTimer;
     public World world;
     public Body b2body;
     private TextureRegion playerStand;
     public Player(LevelOneScreen screen){
-        super(screen.getAtlas().findRegion("little_mario"));
+        super(screen.getAtlas().findRegion("player"));
+        Box2DDebugRenderer debugRenderer = new Box2DDebugRenderer();
+        debugRenderer.setDrawBodies(false);
         this.world = screen.getWorld();
         currentState = State.STANDING;
         previousState = State.STANDING;
@@ -32,15 +37,15 @@ public class Player extends Sprite {
         runningRight = true;
 
         Array<TextureRegion> frames = new Array<TextureRegion>();
-        for(int i = 1; i < 4 ; i++){
-            frames.add(new TextureRegion(getTexture(),i * 16, 10,16,16));
+        for(int i = 2; i < 5 ; i++){
+            frames.add(new TextureRegion(getTexture(),i * 16, 0,16,16));
 
         }
         playerRun = new Animation(0.1f,frames);
         frames.clear();
 
         for(int i = 4; i < 6 ; i++){
-            frames.add(new TextureRegion(getTexture(),i * 16,10,16,16));
+            frames.add(new TextureRegion(getTexture(),i * 16,0,16,16));
 
         }
         playerJump = new Animation(0.1f,frames);
@@ -48,16 +53,80 @@ public class Player extends Sprite {
 
         definePlayer();
 
-        playerStand = new TextureRegion(getTexture(),0,10,16,16);
+        playerStand = new TextureRegion(getTexture(),32,0,16,16);
         setBounds(0,0,16 / Main.PPM,16/Main.PPM);
         setRegion(playerStand);
         isDead = false;
+        isComplete = false;
+    }
+    public Player(LevelTwoScreen screen){
+        super(screen.getAtlas().findRegion("player"));
+        this.world = screen.getWorld();
+        currentState = State.STANDING;
+        previousState = State.STANDING;
+        stateTimer = 0;
+        runningRight = true;
+
+        Array<TextureRegion> frames = new Array<TextureRegion>();
+        for(int i = 2; i < 5 ; i++){
+            frames.add(new TextureRegion(getTexture(),i * 16, 0,16,16));
+
+        }
+        playerRun = new Animation(0.1f,frames);
+        frames.clear();
+
+        for(int i = 4; i < 6 ; i++){
+            frames.add(new TextureRegion(getTexture(),i * 16,0,16,16));
+
+        }
+        playerJump = new Animation(0.1f,frames);
+        frames.clear();
+
+        definePlayer();
+
+        playerStand = new TextureRegion(getTexture(),32,0,16,16);
+        setBounds(0,0,16 / Main.PPM,16/Main.PPM);
+        setRegion(playerStand);
+        isDead = false;
+        isComplete = false;
+    }
+    public Player(LevelThreeScreen screen){
+        super(screen.getAtlas().findRegion("player"));
+        this.world = screen.getWorld();
+        currentState = State.STANDING;
+        previousState = State.STANDING;
+        stateTimer = 0;
+        runningRight = true;
+
+        Array<TextureRegion> frames = new Array<TextureRegion>();
+        for(int i = 3; i < 5 ; i++){
+            frames.add(new TextureRegion(getTexture(), i * 16, 0,14,16));
+
+        }
+        playerRun = new Animation(0.1f,frames);
+        frames.clear();
+
+        for(int i = 4; i < 6 ; i++){
+            frames.add(new TextureRegion(getTexture(),i * 16,0,16,16));
+
+        }
+        playerJump = new Animation(0.1f,frames);
+        frames.clear();
+
+        definePlayer();
+
+        playerStand = new TextureRegion(getTexture(),32,0,16,16);
+        setBounds(0,0,16 / Main.PPM,16/Main.PPM);
+        setRegion(playerStand);
+        isDead = false;
+        isComplete = false;
     }
 
 
     public void update(float dt){
         setPosition(b2body.getPosition().x - getWidth() / 2,b2body.getPosition().y - getHeight() / 2);
         setRegion(getFrame(dt));
+
     }
 
     public TextureRegion getFrame(float dt){
@@ -88,9 +157,8 @@ public class Player extends Sprite {
         return region;
     }
     public State getState(){
-        if(isDead)
-            return State.DEAD;
-        else if (b2body.getLinearVelocity().y > 0 || (b2body.getLinearVelocity().y < 0 && previousState == State.JUMPING))
+
+        if (b2body.getLinearVelocity().y > 0 || (b2body.getLinearVelocity().y < 0 && previousState == State.JUMPING))
                 return State.JUMPING;
         else if (b2body.getLinearVelocity().y < 0)
             return State.FALLING;
@@ -102,16 +170,21 @@ public class Player extends Sprite {
     public boolean isDead(){
         return isDead;
     }
-    public float getStateTimer(){
-        return stateTimer;
-    }
 
     public void hit(){
         isDead = true;
     }
+    public  void complete(){
+        isComplete = true;
+    }
+    public boolean isComplete(){
+        return isComplete;
+    }
+
+
     public void definePlayer(){
         BodyDef bdef = new BodyDef();
-        bdef.position.set(32/ Main.PPM,32 / Main.PPM);
+        bdef.position.set(80/ Main.PPM,100 / Main.PPM);
         bdef.type = BodyDef.BodyType.DynamicBody;
 
         b2body = world.createBody(bdef);
@@ -121,9 +194,8 @@ public class Player extends Sprite {
         CircleShape shape = new CircleShape();
         shape.setRadius(6 / Main.PPM);
         fdef.filter.categoryBits = Main.PLAYER_BIT;
-
-        fdef.filter.maskBits = Main.GROUND_BIT | Main.BRICK_BIT | Main.ENEMY_BIT | Main.OBJECT_BIT | Main.ENEMY_HEAD_BIT;
-
+        fdef.filter.maskBits = Main.GROUND_BIT |  Main.COMPLETION_BIT | Main.ENEMY_HEAD_BIT | Main.FIREBALL_BIT | Main.ENEMY_BIT | Main.BOSS_BIT  ;
+     //   fdef.filter.maskBits = Main.GROUND_BIT;
         fdef.shape = shape;
         b2body.createFixture(fdef).setUserData(this);
 

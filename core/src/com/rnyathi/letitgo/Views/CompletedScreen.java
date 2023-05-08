@@ -1,11 +1,9 @@
 package com.rnyathi.letitgo.Views;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -14,28 +12,26 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.rnyathi.letitgo.Main;
 import com.rnyathi.letitgo.Scenes.Hud;
 
-public class GameOverScreen implements Screen {
+public class CompletedScreen implements Screen {
     private Viewport viewport;
     private Stage stage;
+    private String score;
+    private String time;
 
     private Main parent;
-    private String time;
-    private String score;
-    private int level;
-    public GameOverScreen(Main main, String score, String time, int level){
+
+    public CompletedScreen(Main main, String score, String time){
 
         parent = main;
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
         this.score = score;
         this.time = time;
-        this.level = level;
     }
 
     @Override
@@ -48,36 +44,27 @@ public class GameOverScreen implements Screen {
         table.setFillParent(true);
 
         Skin skin = new Skin(Gdx.files.internal("Skins/glassy-ui.json"));
-        Label gameOverLabel = new Label("Game Over", font);
+        Label completedLabel = new Label("You Win", font);
         Label scoreLabel = new Label(score, font);
         Label timeLabel = new Label(time, font);
         Label score = new Label("Score", font);
         Label time = new Label("Time", font);
-        TextButton startAgain = new TextButton("Start Again", skin, "small");
-        TextButton mainMenu = new TextButton("Main Menu", skin, "small");
-        if(level == 1){
-            startAgain.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent changeEvent, Actor actor) {
-                    parent.changeScreen(Main.LEVELONE);
-                }
-            });
-        } else if(level == 2){
-            startAgain.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent changeEvent, Actor actor) {
-                    parent.changeScreen(Main.LEVELTWO);
-                }
-            });
-        } else if(level == 3){
-            startAgain.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent changeEvent, Actor actor) {
-                    parent.changeScreen(Main.LEVELTHREE);
-                }
-            });
-        }
 
+        TextButton nextLevel = new TextButton("Next Level", skin, "small");
+        nextLevel.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent changeEvent, Actor actor) {
+                switch(parent.level){
+                    case 1:
+                        parent.changeScreen(Main.LEVELTWO);
+                        break;
+                    case 2:
+                        parent.changeScreen(Main.LEVELTHREE);
+                        break;
+                }
+            }
+        });
+        TextButton mainMenu = new TextButton("Main Menu", skin, "small");
         mainMenu.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
@@ -85,7 +72,7 @@ public class GameOverScreen implements Screen {
             }
         });
         table.add();
-        table.add(gameOverLabel);
+        table.add(completedLabel);
         table.add();
         table.row();
 
@@ -100,9 +87,16 @@ public class GameOverScreen implements Screen {
         table.add(timeLabel);
 
         table.row();
-        table.add(startAgain);
-        table.add();
+        if(parent.level == 3){
+            table.add();
+        } else{
+            table.add(nextLevel);
+            table.add();
+        }
         table.add(mainMenu);
+        if(parent.level == 3){
+            table.add();
+        }
         stage.addActor(table);
     }
 
